@@ -1,1 +1,6 @@
-# able_devices_auth
+# Able Devices Auth #
+
+## License ##
+
+This code is open source software licensed under the
+[GNU Lesser GPL 3.0](https://www.gnu.org/licenses/lgpl-3.0.html) license.
