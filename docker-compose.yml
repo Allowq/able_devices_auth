@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+
+  auth-service:
+    restart: always
+    image: able_io/able_devices_auth:1.0.0
+    hostname: auth-service
+    container_name: auth-service-1
+    ports:
+      - 80:9000
+    environment:
+      JDBC_URL: "jdbc:postgresql://postgres:5432/postgres"
+      JDBC_USER: "postgres"
+      JDBC_PASSWORD: "postgres"
+    depends_on:
+      - postgres
+    networks:
+      - able-io-network
+  postgres-db:
+    restart: always
+    image: bitnami/postgresql:12
+    hostname: postgres
+    container_name: postgresdb-1
+    ports:
+      - 25432:5432
+    environment:
+      POSTGRESQL_USERNAME: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRESQL_DATABASE: "postgres"
+    networks:
+      - able-io-network
+
+networks:
+  able-io-network:
+    driver: bridge
