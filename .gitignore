@@ -1,2 +1,10 @@
+conf/secrets.conf
+conf/silhouette.conf
+logs
+project/project
+project/target
+target
+/.idea
 *.class
 *.log
+.DS_Store
