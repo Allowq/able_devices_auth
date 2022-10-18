@@ -4,10 +4,9 @@ import scalariform.formatter.preferences._
 
 name := "able_devices_auth"
 organizationName := "able_io"
-
 version := "1.0.0"
 
-scalaVersion := "2.13.1"
+scalaVersion := "2.13.8"
 
 resolvers += Resolver.jcenterRepo
 
@@ -65,12 +64,9 @@ scalacOptions ++= Seq(
   "-feature", // Emit warning and location for usages of features that should be imported explicitly.
   "-unchecked", // Enable additional warnings where generated code depends on assumptions.
   "-Xfatal-warnings", // Fail the compilation if there are any warnings.
-  //"-Xlint", // Enable recommended additional warnings.
+  "-Xlint", // Enable recommended additional warnings.
   "-Ywarn-dead-code", // Warn when dead code is identified.
   "-Ywarn-numeric-widen", // Warn when numerics are widened.
-  // Play has a lot of issues with unused imports and unsued params
-  // https://github.com/playframework/playframework/issues/6690
-  // https://github.com/playframework/twirl/issues/105
   "-Xlint:-unused,_"
 )
 

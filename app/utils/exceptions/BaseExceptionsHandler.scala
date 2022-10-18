@@ -2,18 +2,27 @@ package utils.exceptions
 
 import java.time.LocalDateTime
 
-import play.api.http.HttpErrorHandler
+import javax.inject.{ Inject, Provider }
+import play.api.{ Configuration, Environment, OptionalSourceMapper, UsefulException }
+import play.api.http.DefaultHttpErrorHandler
 import play.api.libs.json.Json
-import play.api.mvc.Results._
+import play.api.mvc.Results.{ InternalServerError, _ }
 import play.api.mvc.{ RequestHeader, Result }
+import play.api.routing.Router
 
 import scala.concurrent.Future
 
-class BaseExceptionsHandler extends HttpErrorHandler {
-
+class ErrorHandler @Inject() (
+  env: Environment,
+  config: Configuration,
+  sourceMapper: OptionalSourceMapper,
+  router: Provider[Router])
+  extends DefaultHttpErrorHandler(env, config, sourceMapper, router) {
   case class ResourceNotFoundException() extends Exception() {}
   case class ValidationException(message: String) extends Exception(message) {}
   case class ErrorResponse(status: Int, datetime: LocalDateTime, error: String)
+
+  private val logger = org.slf4j.LoggerFactory.getLogger("application.ErrorHandler")
 
   implicit val errorJsonFormat = Json.format[ErrorResponse]
 
@@ -84,28 +93,26 @@ class BaseExceptionsHandler extends HttpErrorHandler {
     599 -> "Network Connect Timeout Error"
   )
 
-  def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
+  override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
+    logger.debug(s"onClientError: statusCode = $statusCode, uri = ${request.uri}, message = $message")
+
     Future.successful(Status(statusCode)(Json.toJson(ErrorResponse(
       statusCode,
       LocalDateTime.now(),
       s"${if (statusCodesMap.contains(statusCode)) statusCodesMap(statusCode) else "A client error occurred: something went wrong!"}"))))
   }
 
-  def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
+  override protected def onDevServerError(request: RequestHeader, exception: UsefulException): Future[Result] = {
+    exception.printStackTrace()
     Future.successful(
-      exception match {
-        case e: ResourceNotFoundException =>
-          NotFound(Json.toJson(ErrorResponse(play.api.http.Status.NOT_FOUND, LocalDateTime.now(), "Resource not found")))
-        case e: ValidationException =>
-          BadRequest(Json.toJson(ErrorResponse(play.api.http.Status.BAD_REQUEST, LocalDateTime.now(), e.getMessage)))
-        case e => {
-          e.printStackTrace()
-          InternalServerError(Json.toJson(ErrorResponse(
-            play.api.http.Status.INTERNAL_SERVER_ERROR,
-            LocalDateTime.now(),
-            "A server error occurred: " + exception.getMessage)))
-        }
-      }
+      InternalServerError(Json.toJson(ErrorResponse(
+        play.api.http.Status.INTERNAL_SERVER_ERROR,
+        LocalDateTime.now(),
+        "A server error occurred: " + exception.getMessage)))
     )
+  }
+
+  override protected def onProdServerError(request: RequestHeader, exception: UsefulException): Future[Result] = {
+    Future.successful(InternalServerError)
   }
 }

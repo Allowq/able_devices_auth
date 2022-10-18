@@ -63,15 +63,15 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   def provideEnvironment(
     userService: UserService,
     authenticatorService: AuthenticatorService[JWTAuthenticator],
-    eventBus: EventBus): Environment[JWTEnvironment] = {
-
-    Environment[JWTEnvironment](
-      userService,
-      authenticatorService,
-      Seq(),
-      eventBus
-    )
-  }
+    eventBus: EventBus): Environment[JWTEnvironment] =
+    {
+      Environment[JWTEnvironment](
+        userService,
+        authenticatorService,
+        Seq(),
+        eventBus
+      )
+    }
 
   /**
    * Provides the crypter for the authenticator.
@@ -98,17 +98,16 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     crypter: Crypter,
     idGenerator: IDGenerator,
     configuration: Configuration,
-    clock: Clock): AuthenticatorService[JWTAuthenticator] = {
-
-    val encoder = new CrypterAuthenticatorEncoder(crypter)
-    new JWTAuthenticatorService(JWTAuthenticatorSettings(
-      fieldName = configuration.underlying.getString("silhouette.authenticator.headerName"),
-      issuerClaim = configuration.underlying.getString("silhouette.authenticator.issuerClaim"),
-      authenticatorExpiry = Duration(configuration.underlying.getString("silhouette.authenticator.authenticatorExpiry")).asInstanceOf[FiniteDuration],
-      sharedSecret = configuration.underlying.getString("silhouette.authenticator.sharedSecret")
-
-    ), None, encoder, idGenerator, clock)
-  }
+    clock: Clock): AuthenticatorService[JWTAuthenticator] =
+    {
+      val encoder = new CrypterAuthenticatorEncoder(crypter)
+      new JWTAuthenticatorService(JWTAuthenticatorSettings(
+        fieldName = configuration.underlying.getString("silhouette.authenticator.headerName"),
+        issuerClaim = configuration.underlying.getString("silhouette.authenticator.issuerClaim"),
+        authenticatorExpiry = Duration(configuration.underlying.getString("silhouette.authenticator.authenticatorExpiry")).asInstanceOf[FiniteDuration],
+        sharedSecret = configuration.underlying.getString("silhouette.authenticator.sharedSecret")
+      ), None, encoder, idGenerator, clock)
+    }
 
   /**
    *  Provides auth info delegable auth info repository.
@@ -150,10 +149,10 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   @Provides
   def provideCredentialsProvider(
     authInfoRepository: AuthInfoRepository,
-    passwordHasherRegistry: PasswordHasherRegistry): CredentialsProvider = {
-
-    new CredentialsProvider(authInfoRepository, passwordHasherRegistry)
-  }
+    passwordHasherRegistry: PasswordHasherRegistry): CredentialsProvider =
+    {
+      new CredentialsProvider(authInfoRepository, passwordHasherRegistry)
+    }
 
   /**
    * Provides silhouette components

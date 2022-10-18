@@ -33,5 +33,5 @@ class DeviceTable(tag: Tag) extends Table[Device](tag, Some("able_io"), "devices
    * In this case, we are simply passing the id, name, email and password parameters to the User case classes
    * apply and unapply methods.
    */
-  def * = (id, deviceUUID, isRegistered, userIdOpt, deviceName, passwordOpt) <> ((Device.apply _).tupled, Device.unapply)
+  def * = (id, deviceUUID, isRegistered, userIdOpt, deviceName, passwordOpt).<>((Device.apply _).tupled, Device.unapply)
 }

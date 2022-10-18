@@ -40,7 +40,7 @@ case class Device(
    *
    * @return login info
    */
-  def this(name: String, passwordHash: String) {
+  def this(name: String, passwordHash: String) = {
     this(deviceName = name, passwordHashOpt = Some(passwordHash))
   }
 
